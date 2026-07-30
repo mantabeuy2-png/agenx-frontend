@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String    @unique
+  password  String
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  websites  Website[]
+
+  @@map("users")
+}
+
+model Website {
+  id           Int              @id @default(autoincrement())
+  userId       Int              @map("user_id")
+  name         String
+  businessType String?          @map("business_type")
+  businessName String?          @map("business_name")
+  status       WebsiteStatus    @default(draft)
+  content      String?
+  publishedUrl String?          @map("published_url")
+  customDomain String?          @map("custom_domain")
+  createdAt    DateTime         @default(now()) @map("created_at")
+  updatedAt    DateTime         @updatedAt @map("updated_at")
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deployments  WebsiteDeployment[]
+
+  @@map("websites")
+}
+
+model WebsiteDeployment {
+  id        Int        @id @default(autoincrement())
+  websiteId Int        @map("website_id")
+  status    String     @default("pending") // pending, building, success, failed
+  url       String?
+  logs      String?
+  createdAt DateTime   @default(now()) @map("created_at")
+  finishedAt DateTime? @map("finished_at")
+  website   Website    @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+
+  @@map("website_deployments")
+}
+
+enum WebsiteStatus {
+  draft
+  generating
+  ready
+  published
+  failed
+
+  @@map("website_status")
+}

@@ -1,93 +1,92 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+const API_URL = '/api'
 
 interface ApiOptions {
-  method?: string;
-  body?: unknown;
-  headers?: Record<string, string>;
-  token?: string;
+  method?: string
+  body?: unknown
+  headers?: Record<string, string>
 }
 
 async function request<T>(endpoint: string, options: ApiOptions = {}): Promise<T> {
-  const { method = 'GET', body, headers = {}, token } = options;
+  const { method = 'GET', body, headers = {} } = options
 
   const reqHeaders: Record<string, string> = {
     'Content-Type': 'application/json',
     Accept: 'application/json',
     ...headers,
-  };
-
-  if (token) {
-    reqHeaders['Authorization'] = `Bearer ${token}`;
   }
 
   const res = await fetch(`${API_URL}${endpoint}`, {
     method,
     headers: reqHeaders,
     body: body ? JSON.stringify(body) : undefined,
-  });
+    credentials: 'include', // send cookies
+  })
 
   if (!res.ok) {
-    const error = await res.json().catch(() => ({ message: res.statusText }));
-    throw new Error(error.message || `API error: ${res.status}`);
+    const error = await res.json().catch(() => ({ message: res.statusText }))
+    throw new Error(error.error || error.message || `API error: ${res.status}`)
   }
 
-  return res.json();
+  return res.json()
 }
 
 // Auth
 export const auth = {
   login: (email: string, password: string) =>
-    request<{ token: string; user: { id: number; name: string; email: string } }>('/auth/login', {
+    request<{ user: { id: number; name: string; email: string } }>('/auth/login', {
       method: 'POST',
       body: { email, password },
     }),
 
   register: (name: string, email: string, password: string) =>
-    request<{ token: string; user: { id: number; name: string; email: string } }>('/auth/register', {
+    request<{ user: { id: number; name: string; email: string } }>('/auth/register', {
       method: 'POST',
       body: { name, email, password },
     }),
 
-  me: (token: string) =>
-    request<{ id: number; name: string; email: string }>('/auth/me', { token }),
+  me: () =>
+    request<{ user: { id: number; name: string; email: string } | null }>('/auth/me'),
 
-  logout: (token: string) =>
-    request<{ message: string }>('/auth/logout', { method: 'POST', token }),
-};
+  logout: () =>
+    request<{ message: string }>('/auth/logout', { method: 'POST' }),
+}
 
 // Websites
+export interface Website {
+  id: number
+  userId: number
+  name: string
+  businessType: string | null
+  businessName: string | null
+  status: string
+  content: string | null
+  publishedUrl: string | null
+  customDomain: string | null
+  createdAt: string
+  updatedAt: string
+}
+
 export const websites = {
-  list: (token: string) =>
-    request<Array<{ id: number; name: string; status: string; url: string; updated_at: string }>>('/websites', { token }),
+  list: () =>
+    request<{ websites: Website[] }>('/websites'),
 
-  get: (token: string, id: number) =>
-    request<{ id: number; name: string; content: string }>(`/websites/${id}`, { token }),
+  get: (id: number) =>
+    request<{ website: Website }>(`/websites/${id}`),
 
-  create: (token: string, data: { name: string; business_type: string; business_name: string }) =>
-    request<{ id: number; name: string }>('/websites', {
+  create: (data: { name: string; businessType?: string; businessName?: string }) =>
+    request<{ website: Website }>('/websites', {
       method: 'POST',
       body: data,
-      token,
     }),
 
-  updateContent: (token: string, id: number, content: string) =>
+  update: (id: number, data: Partial<Website>) =>
+    request<{ website: Website }>(`/websites/${id}`, {
+      method: 'PUT',
+      body: data,
+    }),
+
+  delete: (id: number) =>
     request<{ message: string }>(`/websites/${id}`, {
-      method: 'PATCH',
-      body: { content },
-      token,
+      method: 'DELETE',
     }),
-
-  generate: (token: string, id: number) =>
-    request<{ message: string; preview_url: string }>(`/websites/${id}/generate`, {
-      method: 'POST',
-      token,
-    }),
-
-  publish: (token: string, id: number) =>
-    request<{ message: string; url: string }>(`/websites/${id}/publish`, {
-      method: 'POST',
-      token,
-    }),
-};
-
-export default request;
+}
