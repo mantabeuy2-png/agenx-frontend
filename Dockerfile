@@ -18,7 +18,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV PRISMA_GENERATE_DATAPROXY=false
 
 # Generate Prisma client, then build
-RUN npx prisma generate
+RUN ./node_modules/.bin/prisma generate
 RUN npm run build
 
 # Production image
