@@ -1,11 +1,143 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* ── High-Tech Dark AgenX design system ── */
+  --color-primary: #00f0ff;        /* neon cyan — brand accent */
+  --color-secondary: #a855f7;      /* electric purple */
+  --color-accent: #ff2d92;         /* hot pink — accent pop */
+  --color-midnight: #050714;       /* deep space navy */
+  --color-midnight_text: #e2e8f0;  /* light text */
+  --color-surface: #0e1324;        /* card / panel dark */
+  --color-surface_light: #161d30;   /* glass panel */
+  --color-Lightsuccess: #0dcccf1a;
+
+  --shadow-cause-shadow: 0px 4px 17px 0px #00000008;
+  --shadow-featureShadow: 0px 72px 129px 0px #00000040;
+  --shadow-glow: 0 0 20px 4px #00f0ff33, 0 0 40px 8px #a855f722;
+  --shadow-glow-purple: 0 0 20px 4px #a855f733, 0 0 40px 8px #00f0ff22;
+
+  --background-image-header: radial-gradient(ellipse at top, #161d30 0%, #050714 65%);
+  --background-image-testimonial-bg: url('/images/people/bg-line.png');
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
+/* ── Core base ── */
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-700, currentColor);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-midnight text-midnight_text antialiased;
+    background: radial-gradient(ellipse at top, #0e1324 0%, #050714 55%) fixed;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  section {
+    @apply py-10;
+  }
+
+  h1 {
+    @apply text-5xl md:text-[3.75rem] font-semibold tracking-tight;
+  }
+  h2 {
+    @apply text-4xl sm:text-5xl font-semibold tracking-tight;
+  }
+  h3 {
+    @apply text-2xl sm:text-3xl font-semibold;
+  }
 }
+
+/* ── Container / utilities ── */
+@layer utilities {
+  .container {
+    @apply max-w-7xl mx-auto w-full px-4;
+  }
+
+  /* frosted glass panels */
+  .glass {
+    @apply bg-surface_light/50 border border-white/5;
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+  }
+  .glass-strong {
+    @apply bg-surface/60 border border-white/10;
+    backdrop-filter: blur(20px) saturate(200%);
+    -webkit-backdrop-filter: blur(20px) saturate(200%);
+  }
+
+  /* neon glow helpers */
+  .neon {
+    box-shadow: 0 0 12px 2px #00f0ff44, 0 0 24px 4px #a855f733;
+  }
+  .neon-purple {
+    box-shadow: 0 0 12px 2px #a855f744, 0 0 24px 4px #00f0ff33;
+  }
+
+  /* animated gradient */
+  .bg-anim-gradient {
+    background: linear-gradient(120deg, #00f0ff, #a855f7, #ff2d92, #00f0ff);
+    background-size: 600% 600%;
+    animation: gradientShift 12s ease infinite;
+  }
+  @keyframes gradientShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* hero pixel / particle grid background */
+  .noise-grid {
+    background-image: radial-gradient(#00f0ff15 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  /* 3D tilt transform helpers */
+  .perspective {
+    perspective: 1200px;
+  }
+
+  a {
+    @apply text-primary;
+  }
+}
+
+/* GrapesJS overrides (keep) */
+.gjs-editor-cont { font-size: 14px; }
+.gjs-cv-canvas { width: 100%; height: 100%; }
+.gjs-blocks-c { padding: 8px; }
+.gjs-block {
+  border: 1px solid #374151;
+  border-radius: 8px;
+  padding: 12px 8px;
+  margin-bottom: 6px;
+  background: #1f2937;
+  color: #d1d5db;
+  min-height: auto;
+  transition: all 0.15s;
+}
+.gjs-block:hover {
+  border-color: #a855f7;
+  background: #374151;
+}
+.gjs-block-label { font-size: 12px; font-weight: 500; line-height: normal; }
+.gjs-block-category { margin-bottom: 12px; }
+.gjs-title {
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: .05em; color: #9ca3af; padding: 4px 0; margin-bottom: 8px;
+}
+.gjs-sm-sector-title {
+  font-size: 12px; font-weight: 600; background: #374151;
+  color: #e5e7eb; border: none; border-radius: 6px; padding: 8px 12px;
+}
+.gjs-sm-sector { margin-bottom: 4px; }
+.gjs-sm-properties { padding: 8px; background: #1f2937; }
+.gjs-field { background: #374151; border: 1px solid #4b5563; border-radius: 6px; color: #e5e7eb; }
